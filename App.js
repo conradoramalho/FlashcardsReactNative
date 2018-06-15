@@ -1,23 +1,29 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { View } from "react-native";
+import { createStore, applyMiddleware } from "redux";
+import { Provider } from "react-redux";
+import reducer from "./app/reducers";
+import FlashStatusBar from "./app/components/FlashStatusBar";
+import { black } from "./app/main/colors";
+import { setLocalNotification } from "./app/main/Notification";
+import Navigation from "./app/main/Router";
+import reduxThunk from "redux-thunk";
 
 export default class App extends React.Component {
+  componentDidMount() {
+    setLocalNotification();
+  }
+
   render() {
+    const store = createStore(reducer, {}, applyMiddleware(reduxThunk));
+
     return (
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-        <Text>Changes you make will automatically reload.</Text>
-        <Text>Shake your phone to open the developer menu.</Text>
-      </View>
+      <Provider store={store}>
+        <View style={{ flex: 1 }}>
+          <FlashStatusBar backgroundColor={black} barStyle="light-content" />
+          <Navigation />
+        </View>
+      </Provider>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
