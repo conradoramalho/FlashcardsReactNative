@@ -1,18 +1,15 @@
-import React, { Component } from "react";
-import { View, StyleSheet, Text, FlatList, AsyncStorage } from "react-native";
+import React, { PureComponent } from "react";
+import { View, FlatList } from "react-native";
 import DeckSummary from "./DeckSummary";
 import { AppLoading } from "expo";
 import { connect } from "react-redux";
-import { getAllDecks, receiveDecks } from "../actions";
+import { receiveDecks } from "../actions";
 import API from "../main/api";
-import _ from "lodash";
 
-class DeckList extends Component {
-  static navigationOptions = ({ navigation }) => {
-    return {
-      title: "Home"
-    };
-  };
+class DeckList extends PureComponent {
+  static navigationOptions = ({ navigation }) => ({
+    title: "Home"
+  });
 
   state = {
     isReady: false
@@ -21,25 +18,9 @@ class DeckList extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
 
-    this.getKey();
-
     API.getDecks()
       .then(decks => dispatch(receiveDecks(decks)))
       .then(() => this.setState(() => ({ isReady: true })));
-  }
-
-  async getKey() {
-    try {
-      console.log("value: ", value);
-      await AsyncStorage.setItem("@MySuperStore:key", "value: 10");
-
-      console.log("value: insert", value);
-      const value = await AsyncStorage.getItem("@MySuperStore:key");
-      console.log("value: response", value);
-      this.setState({ myKey: "value" });
-    } catch (error) {
-      console.log("Error retrieving data" + error);
-    }
   }
 
   render() {
@@ -49,11 +30,10 @@ class DeckList extends Component {
     if (!isReady) return <AppLoading />;
 
     return (
-      <View style={styles.deck}>
+      <View>
         <FlatList
-          style=""
-          data={this.props.decks}
-          keyExtractor={(item, index) => index}
+          data={decks}
+          keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <DeckSummary deck={item} navigation={navigation} />
           )}
@@ -63,19 +43,8 @@ class DeckList extends Component {
   }
 }
 
-const styles = StyleSheet.create({
-  deck: {
-    flexDirection: "row",
-    marginTop: 12
-  }
+const mapStateToProps = ({ deckReducer: { decks } }) => ({
+  decks
 });
-
-function mapStateToProps(decks) {
-  const n = decks.map((val, title) => ({ ...val, title }));
-
-  return {
-    decks: n
-  };
-}
 
 export default connect(mapStateToProps)(DeckList);

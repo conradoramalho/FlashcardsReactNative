@@ -9,7 +9,6 @@ import {
 import { white } from "../main/colors";
 
 export default function DeckSummary({ deck, navigation }) {
-  console.log("DeckSummary: ");
   return (
     <View style={styles.item}>
       {deck.questions && (

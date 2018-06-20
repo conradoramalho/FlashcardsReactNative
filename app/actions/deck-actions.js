@@ -3,7 +3,7 @@ import * as ACTIONS from "./types";
 
 export const receiveDecks = decks => ({
   type: ACTIONS.RECEIVE_DECKS_REQUEST,
-  decks
+  payload: decks
 });
 
 export const addNewDeck = title => dispatch =>

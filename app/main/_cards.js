@@ -1,10 +1,10 @@
 import { AsyncStorage } from "react-native";
 
-export const FLASHCARDS_STORAGE_KEY = "jpniederer:flashcards";
+export const FLASHCARDS_STORAGE_KEY = "reactnative:flashcards";
 
 function setInitialData() {
-  const initialData = {
-    React: {
+  const initialData = [
+    {
       title: "React",
       questions: [
         {
@@ -17,7 +17,7 @@ function setInitialData() {
         }
       ]
     },
-    JavaScript: {
+    {
       title: "JavaScript",
       questions: [
         {
@@ -27,7 +27,7 @@ function setInitialData() {
         }
       ]
     }
-  };
+  ];
 
   AsyncStorage.setItem(FLASHCARDS_STORAGE_KEY, JSON.stringify(initialData));
 

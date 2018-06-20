@@ -1,13 +1,30 @@
 import React, { Component } from "react";
-import { View, StyleSheet } from "react-native";
-import { Button, Text } from "react-native-elements";
-import { green, red, white, purple, orange } from "../main/colors";
-import GenericButton from "./GenericButton";
+import { View, TouchableOpacity } from "react-native";
+import { Text } from "react-native-elements";
+import styled from "styled-components/native";
 import { connect } from "react-redux";
 import {
   clearLocalNotification,
   setLocalNotification
 } from "../main/Notification";
+
+const StyledView = styled.View`
+  flex: 1;
+  background-color: white;
+  padding: 15px;
+  align-items: center;
+`;
+
+const StyledButton = styled.TouchableOpacity`
+  margin-top: 20px;
+  padding: 20px;
+  width: 100%;
+  background-color: #000;
+`;
+
+const ButtonText = styled.Text`
+  color: #fff;
+`;
 
 class Quiz extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -70,7 +87,7 @@ class Quiz extends Component {
     const isDone = questionsRemaining === -1;
 
     return (
-      <View style={styles.container}>
+      <StyledView>
         {isDone ? (
           <View>
             <Text h2>Quiz Complete</Text>
@@ -80,29 +97,28 @@ class Quiz extends Component {
             <Text>
               {Math.round((correctCount / questions.length) * 100, 4)}%
             </Text>
-            <Button
-              title="Restart Quiz"
-              backgroundColor={green}
-              style={styles.button}
+            <StyledButton
               onPress={() =>
                 navigation.navigate("Quiz", {
                   title: "Quiz on " + title,
                   deckTitle: title
                 })
               }
-            />
-            <Button
-              title="Back to Deck"
-              backgroundColor={purple}
-              style={styles.button}
-              onPress={() => navigation.navigate("Deck", { title: title })}
-            />
-            <Button
-              title="Back to Deck List"
-              backgroundColor={orange}
-              style={styles.button}
-              onPress={() => navigation.navigate("DeckList")}
-            />
+            >
+              <ButtonText>Restart</ButtonText>
+            </StyledButton>
+            <StyledButton
+              onPress={() =>
+                navigation.navigate("Deck", {
+                  title: title
+                })
+              }
+            >
+              <ButtonText>Back</ButtonText>
+            </StyledButton>
+            <StyledButton onPress={() => navigation.navigate("DeckList")}>
+              <ButtonText>Back to List</ButtonText>
+            </StyledButton>
           </View>
         ) : (
           <View>
@@ -112,50 +128,28 @@ class Quiz extends Component {
                 ? questions[currentIndex].answer
                 : questions[currentIndex].question}
             </Text>
-            <Button
-              title={showAnswer ? "Hide Answer" : "Show Answer"}
-              backgroundColor={orange}
-              style={styles.button}
-              onPress={this.flipCard.bind(this)}
-            />
-            <Button
-              title="Correct"
-              backgroundColor={green}
-              style={styles.button}
-              onPress={this.answerCorrectly.bind(this)}
-            />
-            <Button
-              title="Incorrect"
-              backgroundColor={red}
-              style={styles.button}
-              onPress={this.answerIncorrectly.bind(this)}
-            />
+            <StyledButton onPress={this.flipCard.bind(this)}>
+              <ButtonText>
+                {showAnswer ? "Hide Answer" : "Show Answer"}
+              </ButtonText>
+            </StyledButton>
+            <StyledButton onPress={this.answerCorrectly.bind(this)}>
+              <ButtonText>Correct</ButtonText>
+            </StyledButton>
+            <StyledButton onPress={this.answerIncorrectly.bind(this)}>
+              <ButtonText>Incorrect</ButtonText>
+            </StyledButton>
           </View>
         )}
-      </View>
+      </StyledView>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: white,
-    padding: 15,
-    alignItems: "center"
-  },
-  button: {
-    padding: 12
-  }
-});
-
-function mapStateToProps(state, { navigation }) {
+function mapStateToProps({ deckReducer: { decks } }, { navigation }) {
   const { deckTitle } = navigation.state.params;
 
-  return {
-    title: deckTitle,
-    deck: state[deckTitle]
-  };
+  return { title: deckTitle, deck: decks.find(x => x.title === deckTitle) };
 }
 
 function mapDispatchToProps(dispatch, { navigation }) {
