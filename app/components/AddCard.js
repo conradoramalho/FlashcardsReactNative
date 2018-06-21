@@ -21,6 +21,8 @@ const ButtonText = styled.Text`
   padding: 12px;
 `;
 
+const pattern = /\s*/;
+
 class AddCard extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     const { title } = navigation.state.params;
@@ -37,34 +39,27 @@ class AddCard extends PureComponent {
   };
 
   onQuestionChange = question => {
-    const isQuestionEmpty = !question;
-    const isAnswerNotValid = !this.state.answer;
+    const { answer } = this.state;
 
     this.setState({
       question,
-      isCardValid: !isAnswerNotValid && !isQuestionEmpty
+      isCardValid: !this.isEmptyOrInvalid(answer, question)
     });
   };
 
   onAnswerChange = answer => {
-    const isAnswerEmpty = !answer;
-    const isQuestionNotValid = !this.state.question;
+    const { question } = this.state;
 
     this.setState({
       answer,
-      isCardValid: !isQuestionNotValid && !isAnswerEmpty
+      isCardValid: !this.isEmptyOrInvalid(answer, question)
     });
   };
 
   addCard = () => {
-    const {
-      navigation,
-      deck: { title },
-      addQuestionToDeck
-    } = this.props;
+    const { navigation, title, addQuestionToDeck } = this.props;
 
     const { question, answer } = this.state;
-    console.log("question: ", question);
 
     Keyboard.dismiss();
 
@@ -76,8 +71,14 @@ class AddCard extends PureComponent {
       isCardValid: false
     });
 
-    navigation.goBack();
+    navigation.navigate("Deck", { title });
   };
+
+  isEmptyOrInvalid = (first, second) =>
+    !first ||
+    !second ||
+    !first.replace(pattern, "").length > 0 ||
+    !second.replace(pattern, "").length > 0;
 
   render() {
     const { question, answer, isCardValid } = this.state;

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { View, Text } from "react-native";
 import styled from "styled-components/native";
 import { connect } from "react-redux";
@@ -25,7 +25,7 @@ const ButtonText = styled.Text`
   color: #fff;
 `;
 
-class Deck extends Component {
+class Deck extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     const { title } = navigation.state.params;
 
@@ -36,6 +36,7 @@ class Deck extends Component {
 
   render() {
     const { title, navigation, deck } = this.props;
+
     const questions = deck && deck.questions ? deck.questions : 0;
 
     return (
@@ -60,7 +61,7 @@ class Deck extends Component {
           <ButtonText>Add a Card</ButtonText>
         </StyledButton>
         <StyledButton
-          disabled={questions.length === 0}
+          disabled={!(questions.length > 0)}
           onPress={() =>
             navigation.navigate("Quiz", {
               title: `Quiz on ${title}`,

@@ -7,10 +7,11 @@ import {
   KeyboardAvoidingView
 } from "react-native";
 import { FormLabel, FormInput, Button } from "react-native-elements";
-import GenericButton from "./GenericButton";
-import { white, blue } from "../main/colors";
+import { white, black } from "../main/colors";
 import { connect } from "react-redux";
 import { addNewDeck } from "../actions";
+
+const pattern = /\s*/;
 
 class AddDeck extends Component {
   state = {
@@ -18,45 +19,47 @@ class AddDeck extends Component {
     isTitleValid: false
   };
 
-  onTitleChange(title) {
-    const isEmpty = !title;
+  onTitleChange = title => {
+    const isEmpty = !title || !(title.replace(pattern, "").length > 0);
     const hasDeckWithTitle = this.props.decks.includes(title.toUpperCase());
 
     this.setState({
       deckTitle: title,
       isTitleValid: !isEmpty && !hasDeckWithTitle
     });
-  }
+  };
 
-  addDeck() {
-    const { navigation } = this.props;
+  addDeck = () => {
+    const { navigation, addNewDeck } = this.props;
     const title = this.state.deckTitle;
+
     Keyboard.dismiss();
+
     this.setState({
       deckTitle: "",
       isTitleValid: false
     });
 
-    this.props.addNewDeck(title).then(() => {
+    addNewDeck(title).then(() => {
       navigation.navigate("Deck", { title });
     });
-  }
+  };
 
   render() {
     return (
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <FormLabel>Enter a Title for the New Deck</FormLabel>
         <FormInput
-          onChangeText={this.onTitleChange.bind(this)}
+          onChangeText={this.onTitleChange}
           placeholder="Title of the New Deck"
           value={this.state.deckTitle}
         />
         <Button
           title="Create Deck"
-          backgroundColor={blue}
+          backgroundColor={black}
           style={styles.button}
           disabled={!this.state.isTitleValid}
-          onPress={this.addDeck.bind(this)}
+          onPress={this.addDeck}
         />
       </KeyboardAvoidingView>
     );

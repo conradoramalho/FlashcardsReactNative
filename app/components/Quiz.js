@@ -1,12 +1,9 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { Text } from "react-native-elements";
 import styled from "styled-components/native";
 import { connect } from "react-redux";
-import {
-  clearLocalNotification,
-  setLocalNotification
-} from "../main/Notification";
+import CompletedQuiz from "./CompletedQuiz";
 
 const StyledView = styled.View`
   flex: 1;
@@ -26,7 +23,7 @@ const ButtonText = styled.Text`
   color: #fff;
 `;
 
-class Quiz extends Component {
+class Quiz extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     const { title } = navigation.state.params;
 
@@ -41,11 +38,7 @@ class Quiz extends Component {
     showAnswer: false
   };
 
-  componentDidMount() {
-    clearLocalNotification().then(setLocalNotification);
-  }
-
-  answerCorrectly() {
+  answerCorrectly = () => {
     let { currentIndex, correctCount } = this.state;
     currentIndex++;
     correctCount++;
@@ -55,9 +48,9 @@ class Quiz extends Component {
       correctCount,
       showAnswer: false
     });
-  }
+  };
 
-  answerIncorrectly() {
+  answerIncorrectly = () => {
     let { currentIndex, correctCount } = this.state;
     currentIndex++;
 
@@ -66,9 +59,9 @@ class Quiz extends Component {
       correctCount,
       showAnswer: false
     });
-  }
+  };
 
-  flipCard() {
+  flipCard = () => {
     let { currentIndex, correctCount, showAnswer } = this.state;
     showAnswer = !showAnswer;
 
@@ -77,11 +70,18 @@ class Quiz extends Component {
       correctCount,
       showAnswer
     });
-  }
+  };
+
+  restart = () =>
+    this.setState({
+      currentIndex: 0,
+      correctCount: 0,
+      showAnswer: false
+    });
 
   render() {
     const questions = this.props.deck ? this.props.deck.questions : "";
-    const { goBack, navigation, title } = this.props;
+    const { title, navigation } = this.props;
     const { currentIndex, correctCount, showAnswer } = this.state;
     const questionsRemaining = questions.length - currentIndex - 1;
     const isDone = questionsRemaining === -1;
@@ -89,37 +89,13 @@ class Quiz extends Component {
     return (
       <StyledView>
         {isDone ? (
-          <View>
-            <Text h2>Quiz Complete</Text>
-            <Text>
-              You got {correctCount} out of {questions.length}.
-            </Text>
-            <Text>
-              {Math.round((correctCount / questions.length) * 100, 4)}%
-            </Text>
-            <StyledButton
-              onPress={() =>
-                navigation.navigate("Quiz", {
-                  title: "Quiz on " + title,
-                  deckTitle: title
-                })
-              }
-            >
-              <ButtonText>Restart</ButtonText>
-            </StyledButton>
-            <StyledButton
-              onPress={() =>
-                navigation.navigate("Deck", {
-                  title: title
-                })
-              }
-            >
-              <ButtonText>Back</ButtonText>
-            </StyledButton>
-            <StyledButton onPress={() => navigation.navigate("DeckList")}>
-              <ButtonText>Back to List</ButtonText>
-            </StyledButton>
-          </View>
+          <CompletedQuiz
+            title={title}
+            correctCount={correctCount}
+            questionsCount={questions.length}
+            navigation={navigation.navigate}
+            restart={this.restart}
+          />
         ) : (
           <View>
             <Text>{questionsRemaining} questions remaining</Text>
@@ -128,15 +104,15 @@ class Quiz extends Component {
                 ? questions[currentIndex].answer
                 : questions[currentIndex].question}
             </Text>
-            <StyledButton onPress={this.flipCard.bind(this)}>
+            <StyledButton onPress={this.flipCard}>
               <ButtonText>
                 {showAnswer ? "Hide Answer" : "Show Answer"}
               </ButtonText>
             </StyledButton>
-            <StyledButton onPress={this.answerCorrectly.bind(this)}>
+            <StyledButton onPress={this.answerCorrectly}>
               <ButtonText>Correct</ButtonText>
             </StyledButton>
-            <StyledButton onPress={this.answerIncorrectly.bind(this)}>
+            <StyledButton onPress={this.answerIncorrectly}>
               <ButtonText>Incorrect</ButtonText>
             </StyledButton>
           </View>
@@ -146,21 +122,10 @@ class Quiz extends Component {
   }
 }
 
-function mapStateToProps({ deckReducer: { decks } }, { navigation }) {
+const mapStateToProps = ({ deckReducer: { decks } }, { navigation }) => {
   const { deckTitle } = navigation.state.params;
 
   return { title: deckTitle, deck: decks.find(x => x.title === deckTitle) };
-}
+};
 
-function mapDispatchToProps(dispatch, { navigation }) {
-  const { deckTitle } = navigation.state.params;
-
-  return {
-    goBack: () => navigation.goBack()
-  };
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Quiz);
+export default connect(mapStateToProps)(Quiz);

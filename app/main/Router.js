@@ -58,19 +58,19 @@ const Navigation = createStackNavigator({
   Deck: {
     screen: Deck,
     navigationOptions: {
-      headerTintColor: "#fff"
+      headerTintColor: "#000"
     }
   },
   AddCard: {
     screen: AddCard,
     navigationOptions: {
-      headerTintColor: "#fff"
+      headerTintColor: "#000"
     }
   },
   Quiz: {
     screen: Quiz,
     navigationOptions: {
-      headerTintColor: "#fff"
+      headerTintColor: "#000"
     }
   }
 });

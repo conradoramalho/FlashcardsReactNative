@@ -5,43 +5,36 @@ const getDecks = () =>
   AsyncStorage.getItem(FLASHCARDS_STORAGE_KEY).then(setupInitialResults);
 
 const getDeck = title =>
-  AsyncStorage.getItem(FLASHCARDS_STORAGE_KEY).then(results => {
-    const decks = JSON.parse(results);
-    return decks.find(x => x.title === title);
+  AsyncStorage.getItem(FLASHCARDS_STORAGE_KEY)
+    .then(results => JSON.parse(results))
+    .then(decks => decks.find(x => x.title === title));
+
+const saveDeckTitle = async title => {
+  const decks = await getDecks();
+
+  return AsyncStorage.setItem(
+    FLASHCARDS_STORAGE_KEY,
+    JSON.stringify([
+      ...decks,
+      {
+        title,
+        questions: []
+      }
+    ])
+  );
+};
+
+const addCardToDeck = async (title, card) => {
+  const decks = await getDecks();
+
+  const newDecks = decks.map(x => {
+    if (x.title === title) return { ...x, questions: [...x.questions, card] };
+
+    return { ...x };
   });
 
-const saveDeckTitle = title =>
-  AsyncStorage.mergeItem(
-    FLASHCARDS_STORAGE_KEY,
-    JSON.stringify({
-      title,
-      questions: []
-    })
-  );
-
-const addCardToDeck = (title, card) =>
-  getDeck(title)
-    .then(result => {
-      return result;
-    })
-    .then(deck => {
-      const { question, answer } = card;
-      const updatedQuestions = deck.questions.concat({
-        question,
-        answer
-      });
-
-      AsyncStorage.mergeItem(
-        FLASHCARDS_STORAGE_KEY,
-        JSON.stringify({
-          title,
-          questions: updatedQuestions
-        })
-      );
-    })
-    .catch(() => {
-      console.log("Error");
-    });
+  return AsyncStorage.setItem(FLASHCARDS_STORAGE_KEY, JSON.stringify(newDecks));
+};
 
 export default {
   getDecks,
