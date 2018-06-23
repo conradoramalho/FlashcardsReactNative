@@ -1,33 +1,33 @@
-import { AsyncStorage } from "react-native";
+import { AsyncStorage } from 'react-native';
 
-export const FLASHCARDS_STORAGE_KEY = "jpniederer:flashcards";
+export const FLASHCARDS_STORAGE_KEY = 'flashcards:flashcards:flashcards';
 
 function setInitialData() {
-  const initialData = {
-    React: {
-      title: "React",
+  const initialData = [
+    {
+      title: 'React',
       questions: [
         {
-          question: "What is React?",
-          answer: "A library for managing user interfaces"
+          question: 'What is React?',
+          answer: 'A library for managing user interfaces',
         },
         {
-          question: "Where do you make Ajax requests in React?",
-          answer: "The componentDidMount lifecycle event"
-        }
-      ]
+          question: 'Where do you make Ajax requests in React?',
+          answer: 'The componentDidMount lifecycle event',
+        },
+      ],
     },
-    JavaScript: {
-      title: "JavaScript",
+    {
+      title: 'JavaScript',
       questions: [
         {
-          question: "What is a closure?",
+          question: 'What is a closure?',
           answer:
-            "The combination of a function and the lexical environment within which that function was declared."
-        }
-      ]
-    }
-  };
+            'The combination of a function and the lexical environment within which that function was declared.',
+        },
+      ],
+    },
+  ];
 
   AsyncStorage.setItem(FLASHCARDS_STORAGE_KEY, JSON.stringify(initialData));
 
