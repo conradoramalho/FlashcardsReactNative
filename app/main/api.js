@@ -1,52 +1,44 @@
 import { AsyncStorage } from "react-native";
 import { setupInitialResults, FLASHCARDS_STORAGE_KEY } from "./_cards";
 
-class API {
-  static getDecks = () =>
-    AsyncStorage.getItem(FLASHCARDS_STORAGE_KEY).then(setupInitialResults);
+const getDecks = () =>
+  AsyncStorage.getItem(FLASHCARDS_STORAGE_KEY).then(setupInitialResults);
 
-  static getDeck = title =>
-    AsyncStorage.getItem(FLASHCARDS_STORAGE_KEY).then(results => {
-      const decks = JSON.parse(results);
-      return decks[title];
-    });
+const getDeck = title =>
+  AsyncStorage.getItem(FLASHCARDS_STORAGE_KEY)
+    .then(results => JSON.parse(results))
+    .then(decks => decks.find(x => x.title === title));
 
-  static saveDeckTitle = title =>
-    AsyncStorage.mergeItem(
-      FLASHCARDS_STORAGE_KEY,
-      JSON.stringify({
-        [title]: {
-          title,
-          questions: []
-        }
-      })
-    );
+const saveDeckTitle = async title => {
+  const decks = await getDecks();
 
-  static addCardToDeck = (title, card) =>
-    getDeck(title)
-      .then(result => {
-        return result;
-      })
-      .then(deck => {
-        const { question, answer } = card;
-        const updatedQuestions = deck.questions.concat({
-          question,
-          answer
-        });
+  return AsyncStorage.setItem(
+    FLASHCARDS_STORAGE_KEY,
+    JSON.stringify([
+      ...decks,
+      {
+        title,
+        questions: []
+      }
+    ])
+  );
+};
 
-        AsyncStorage.mergeItem(
-          FLASHCARDS_STORAGE_KEY,
-          JSON.stringify({
-            [title]: {
-              title,
-              questions: updatedQuestions
-            }
-          })
-        );
-      })
-      .catch(() => {
-        console.log("Error adding card.");
-      });
-}
+const addCardToDeck = async (title, card) => {
+  const decks = await getDecks();
 
-export default API;
+  const newDecks = decks.map(x => {
+    if (x.title === title) return { ...x, questions: [...x.questions, card] };
+
+    return { ...x };
+  });
+
+  return AsyncStorage.setItem(FLASHCARDS_STORAGE_KEY, JSON.stringify(newDecks));
+};
+
+export default {
+  getDecks,
+  getDeck,
+  saveDeckTitle,
+  addCardToDeck
+};

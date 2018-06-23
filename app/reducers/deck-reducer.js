@@ -1,31 +1,35 @@
 import * as ACTIONS from '../actions/types';
 
 const INITIAL_STATE = {
+<<<<<<< HEAD
   decks: [],
+=======
+  decks: []
+>>>>>>> 9f9e7b809d6399705cdce10ac9e783504f8d0f1b
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ACTIONS.RECEIVE_DECKS_REQUEST:
-      console.log('action.payload: ', action.payload);
-
       return {
         ...state,
-        decks: [action.payload],
+        decks: [...action.payload]
       };
     case ACTIONS.SAVE_DECK_REQUEST:
-      const { title } = action;
       return {
         ...state,
-        [title]: {
-          title,
-          questions: [],
-        },
+        decks: [...state.decks, { title: action.payload, questions: [] }]
       };
+
     case ACTIONS.ADD_QS_DECK_REQUEST:
-      const newState = { ...state };
-      newState[action.title].questions.push(action.card);
-      return { ...state, ...newState };
+      const decks = state.decks.map(x => {
+        if (x.title === action.payload.title)
+          return { ...x, questions: [...x.questions, action.payload.card] };
+
+        return { ...x };
+      });
+
+      return { ...state, decks: [...decks] };
     case ACTIONS.GET_DECK_REQUEST:
     case ACTIONS.GET_DECK_REQUESTS_REQUEST:
       return { ...state, decks: [...action.decks] };

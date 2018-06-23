@@ -1,17 +1,29 @@
-import React, { Component } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  Keyboard,
-  KeyboardAvoidingView
-} from "react-native";
-import { FormLabel, FormInput, Button } from "react-native-elements";
+import React, { PureComponent } from "react";
+import { Keyboard, KeyboardAvoidingView, Text } from "react-native";
+import styled from "styled-components/native";
+import { FormLabel, FormInput, TouchableOpacity } from "react-native-elements";
 import { connect } from "react-redux";
-import { blue } from "../main/colors";
 import { addQuestionToDeck } from "../actions";
 
-class AddCard extends Component {
+const StyledView = styled.View`
+  padding: 12px;
+`;
+
+const ButtonStyled = styled.TouchableOpacity`
+  background-color: #000;
+  width: 100%;
+  padding: 12px;
+`;
+
+const ButtonText = styled.Text`
+  text-align: center;
+  color: #fff;
+  padding: 12px;
+`;
+
+const pattern = /\s*/;
+
+class AddCard extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     const { title } = navigation.state.params;
 
@@ -26,87 +38,79 @@ class AddCard extends Component {
     isCardValid: false
   };
 
-  onQuestionChange(question) {
-    const isQuestionEmpty = !question;
-    const isAnswerNotValid = !this.state.answer;
+  onQuestionChange = question => {
+    const { answer } = this.state;
 
     this.setState({
       question,
-      isCardValid: !isAnswerNotValid && !isQuestionEmpty
+      isCardValid: !this.isEmptyOrInvalid(answer, question)
     });
-  }
+  };
 
-  onAnswerChange(answer) {
-    const isAnswerEmpty = !answer;
-    const isQuestionNotValid = !this.state.question;
+  onAnswerChange = answer => {
+    const { question } = this.state;
 
     this.setState({
       answer,
-      isCardValid: !isQuestionNotValid && !isAnswerEmpty
+      isCardValid: !this.isEmptyOrInvalid(answer, question)
     });
-  }
+  };
 
-  addCard() {
-    const { navigation } = this.props;
+  addCard = () => {
+    const { navigation, title, addQuestionToDeck } = this.props;
+
     const { question, answer } = this.state;
-    const title = this.props.deck.title;
+
     Keyboard.dismiss();
 
-    this.props.addQuestionToDeck(title, { question, answer });
+    addQuestionToDeck(title, { question, answer });
+
     this.setState({
       question: "",
       answer: "",
       isCardValid: false
     });
 
-    navigation.goBack();
-  }
+    navigation.navigate("Deck", { title });
+  };
+
+  isEmptyOrInvalid = (first, second) =>
+    !first ||
+    !second ||
+    !first.replace(pattern, "").length > 0 ||
+    !second.replace(pattern, "").length > 0;
 
   render() {
+    const { question, answer, isCardValid } = this.state;
+
     return (
-      <KeyboardAvoidingView style={styles.deck}>
+      <KeyboardAvoidingView>
         <FormLabel>Question for the Flashcard</FormLabel>
         <FormInput
-          onChangeText={this.onQuestionChange.bind(this)}
-          placeholder="Enter the Question Here"
-          value={this.state.question}
+          onChangeText={this.onQuestionChange}
+          placeholder="Question"
+          value={question}
         />
         <FormLabel>Answer to the Question</FormLabel>
         <FormInput
-          onChangeText={this.onAnswerChange.bind(this)}
-          placeholder="Enter the Answer Here"
-          value={this.state.answer}
+          onChangeText={this.onAnswerChange}
+          placeholder="Answer"
+          value={answer}
         />
-        <Button
-          title="Add Card"
-          backgroundColor={blue}
-          style={styles.button}
-          disabled={!this.state.isCardValid}
-          onPress={this.addCard.bind(this)}
-        />
+        <StyledView>
+          <ButtonStyled disabled={!isCardValid} onPress={this.addCard}>
+            <ButtonText>Add Card</ButtonText>
+          </ButtonStyled>
+        </StyledView>
       </KeyboardAvoidingView>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    marginTop: 12
-  },
-  button: {
-    padding: 12
-  }
-});
-
-function mapStateToProps(state, { navigation }) {
+function mapStateToProps({ deckReducer: { decks } }, { navigation }) {
   const { deckTitle } = navigation.state.params;
 
-  return {
-    title: deckTitle,
-    deck: state[deckTitle]
-  };
+  return { title: deckTitle, deck: decks.find(x => x.title === deckTitle) };
 }
 
 export default connect(

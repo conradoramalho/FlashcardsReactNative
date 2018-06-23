@@ -7,12 +7,14 @@ export const receiveDecks = decks => ({
 });
 
 export const addNewDeck = title => dispatch =>
-  API.saveDeckTitle(title).then(() =>
-    dispatch({
-      type: ACTIONS.SAVE_DECK_REQUEST,
-      title,
+  API.saveDeckTitle(title)
+    .then(() => {
+      dispatch({
+        type: ACTIONS.SAVE_DECK_REQUEST,
+        payload: title,
+      });
     })
-  );
+    .catch(err => console.log(err));
 
 export const getAllDecks = () => ({
   type: ACTIONS.GET_DECK_REQUESTS_REQUEST,
@@ -24,10 +26,9 @@ export const getDeckByTitle = title => ({
   payload: API.getDeck(title),
 });
 
-export const addQuestionToDeck = (title, card) => {
-  return dispatch => {
-    API.addCardToDeck(title, card).then(() => {
-      dispatch({ type: ACTIONS.ADD_QS_DECK_REQUEST, title, card });
-    });
-  };
-};
+export const addQuestionToDeck = (title, card) => dispatch =>
+  API.addCardToDeck(title, card)
+    .then(() =>
+      dispatch({ type: ACTIONS.ADD_QS_DECK_REQUEST, payload: { title, card } })
+    )
+    .catch(err => console.log(err));

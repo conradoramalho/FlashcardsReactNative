@@ -1,6 +1,6 @@
 import { AsyncStorage } from 'react-native';
 
-export const FLASHCARDS_STORAGE_KEY = 'flashcards:flashcards:flashcards';
+export const FLASHCARDS_STORAGE_KEY = 'reactnative:flashcards';
 
 function setInitialData() {
   const initialData = [

@@ -1,15 +1,29 @@
-import React, { Component } from "react";
-import { View, StyleSheet } from "react-native";
-import { Button, Text } from "react-native-elements";
-import { green, red, white, purple, orange } from "../main/colors";
-import GenericButton from "./GenericButton";
+import React, { PureComponent } from "react";
+import { View, TouchableOpacity } from "react-native";
+import { Text } from "react-native-elements";
+import styled from "styled-components/native";
 import { connect } from "react-redux";
-import {
-  clearLocalNotification,
-  setLocalNotification
-} from "../main/Notification";
+import CompletedQuiz from "./CompletedQuiz";
 
-class Quiz extends Component {
+const StyledView = styled.View`
+  flex: 1;
+  background-color: white;
+  padding: 15px;
+  align-items: center;
+`;
+
+const StyledButton = styled.TouchableOpacity`
+  margin-top: 20px;
+  padding: 20px;
+  width: 100%;
+  background-color: #000;
+`;
+
+const ButtonText = styled.Text`
+  color: #fff;
+`;
+
+class Quiz extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     const { title } = navigation.state.params;
 
@@ -24,11 +38,7 @@ class Quiz extends Component {
     showAnswer: false
   };
 
-  componentDidMount() {
-    clearLocalNotification().then(setLocalNotification);
-  }
-
-  answerCorrectly() {
+  answerCorrectly = () => {
     let { currentIndex, correctCount } = this.state;
     currentIndex++;
     correctCount++;
@@ -38,9 +48,9 @@ class Quiz extends Component {
       correctCount,
       showAnswer: false
     });
-  }
+  };
 
-  answerIncorrectly() {
+  answerIncorrectly = () => {
     let { currentIndex, correctCount } = this.state;
     currentIndex++;
 
@@ -49,9 +59,9 @@ class Quiz extends Component {
       correctCount,
       showAnswer: false
     });
-  }
+  };
 
-  flipCard() {
+  flipCard = () => {
     let { currentIndex, correctCount, showAnswer } = this.state;
     showAnswer = !showAnswer;
 
@@ -60,50 +70,32 @@ class Quiz extends Component {
       correctCount,
       showAnswer
     });
-  }
+  };
+
+  restart = () =>
+    this.setState({
+      currentIndex: 0,
+      correctCount: 0,
+      showAnswer: false
+    });
 
   render() {
     const questions = this.props.deck ? this.props.deck.questions : "";
-    const { goBack, navigation, title } = this.props;
+    const { title, navigation } = this.props;
     const { currentIndex, correctCount, showAnswer } = this.state;
     const questionsRemaining = questions.length - currentIndex - 1;
     const isDone = questionsRemaining === -1;
 
     return (
-      <View style={styles.container}>
+      <StyledView>
         {isDone ? (
-          <View>
-            <Text h2>Quiz Complete</Text>
-            <Text>
-              You got {correctCount} out of {questions.length}.
-            </Text>
-            <Text>
-              {Math.round((correctCount / questions.length) * 100, 4)}%
-            </Text>
-            <Button
-              title="Restart Quiz"
-              backgroundColor={green}
-              style={styles.button}
-              onPress={() =>
-                navigation.navigate("Quiz", {
-                  title: "Quiz on " + title,
-                  deckTitle: title
-                })
-              }
-            />
-            <Button
-              title="Back to Deck"
-              backgroundColor={purple}
-              style={styles.button}
-              onPress={() => navigation.navigate("Deck", { title: title })}
-            />
-            <Button
-              title="Back to Deck List"
-              backgroundColor={orange}
-              style={styles.button}
-              onPress={() => navigation.navigate("DeckList")}
-            />
-          </View>
+          <CompletedQuiz
+            title={title}
+            correctCount={correctCount}
+            questionsCount={questions.length}
+            navigation={navigation.navigate}
+            restart={this.restart}
+          />
         ) : (
           <View>
             <Text>{questionsRemaining} questions remaining</Text>
@@ -112,61 +104,28 @@ class Quiz extends Component {
                 ? questions[currentIndex].answer
                 : questions[currentIndex].question}
             </Text>
-            <Button
-              title={showAnswer ? "Hide Answer" : "Show Answer"}
-              backgroundColor={orange}
-              style={styles.button}
-              onPress={this.flipCard.bind(this)}
-            />
-            <Button
-              title="Correct"
-              backgroundColor={green}
-              style={styles.button}
-              onPress={this.answerCorrectly.bind(this)}
-            />
-            <Button
-              title="Incorrect"
-              backgroundColor={red}
-              style={styles.button}
-              onPress={this.answerIncorrectly.bind(this)}
-            />
+            <StyledButton onPress={this.flipCard}>
+              <ButtonText>
+                {showAnswer ? "Hide Answer" : "Show Answer"}
+              </ButtonText>
+            </StyledButton>
+            <StyledButton onPress={this.answerCorrectly}>
+              <ButtonText>Correct</ButtonText>
+            </StyledButton>
+            <StyledButton onPress={this.answerIncorrectly}>
+              <ButtonText>Incorrect</ButtonText>
+            </StyledButton>
           </View>
         )}
-      </View>
+      </StyledView>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: white,
-    padding: 15,
-    alignItems: "center"
-  },
-  button: {
-    padding: 12
-  }
-});
-
-function mapStateToProps(state, { navigation }) {
+const mapStateToProps = ({ deckReducer: { decks } }, { navigation }) => {
   const { deckTitle } = navigation.state.params;
 
-  return {
-    title: deckTitle,
-    deck: state[deckTitle]
-  };
-}
+  return { title: deckTitle, deck: decks.find(x => x.title === deckTitle) };
+};
 
-function mapDispatchToProps(dispatch, { navigation }) {
-  const { deckTitle } = navigation.state.params;
-
-  return {
-    goBack: () => navigation.goBack()
-  };
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Quiz);
+export default connect(mapStateToProps)(Quiz);

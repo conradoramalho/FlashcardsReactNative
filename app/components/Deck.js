@@ -1,10 +1,31 @@
-import React, { Component } from "react";
-import { View, StyleSheet } from "react-native";
-import { Button, Text } from "react-native-elements";
+import React, { PureComponent } from "react";
+import { View, Text } from "react-native";
+import styled from "styled-components/native";
 import { connect } from "react-redux";
-import { green, red, white, purple } from "../main/colors";
 
-class Deck extends Component {
+const StyledView = styled.View`
+  flex: 1;
+  background-color: white;
+  align-items: center;
+  padding: 12px;
+`;
+
+const Header = styled.Text`
+  padding-right: 5px;
+`;
+
+const StyledButton = styled.TouchableOpacity`
+  margin-top: 20px;
+  padding: 20px;
+  width: 100%;
+  background-color: #000;
+`;
+
+const ButtonText = styled.Text`
+  color: #fff;
+`;
+
+class Deck extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     const { title } = navigation.state.params;
 
@@ -14,17 +35,13 @@ class Deck extends Component {
   };
 
   render() {
-    console.log("this.props: ", this.props);
-    const { title } = this.props;
-    const deck = this.props.decks[title];
+    const { title, navigation, deck } = this.props;
+
     const questions = deck && deck.questions ? deck.questions : 0;
-    const { navigation } = this.props;
 
     return (
-      <View style={styles.deck}>
-        <Text h2 style={styles.header}>
-          {title}
-        </Text>
+      <StyledView>
+        <Header h2>{title}</Header>
         <Text h4>{questions.length} card(s) in deck</Text>
         <View>
           {questions.length > 0 ? (
@@ -33,66 +50,41 @@ class Deck extends Component {
             <Text>Add More cards to this deck to take a quiz.</Text>
           )}
         </View>
-        <Button
-          title="Add a Card"
-          backgroundColor={green}
-          style={styles.button}
+        <StyledButton
           onPress={() =>
             navigation.navigate("AddCard", {
-              title: "Add a card to " + title,
+              title: `Add a card to ${title}`,
               deckTitle: title
             })
           }
-        />
-        <Button
-          title="Start Quiz"
-          backgroundColor={purple}
-          style={styles.button}
-          disabled={questions.length === 0}
+        >
+          <ButtonText>Add a Card</ButtonText>
+        </StyledButton>
+        <StyledButton
+          disabled={!(questions.length > 0)}
           onPress={() =>
             navigation.navigate("Quiz", {
-              title: "Quiz on " + title,
+              title: `Quiz on ${title}`,
               deckTitle: title
             })
           }
-        />
-      </View>
+        >
+          <ButtonText>Start Quiz</ButtonText>
+        </StyledButton>
+      </StyledView>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  deck: {
-    flex: 1,
-    backgroundColor: white,
-    alignItems: "center",
-    padding: 12
-  },
-  button: {
-    padding: 12
-  },
-  header: {
-    paddingRight: 5
-  }
+const mapStateToProps = ({ deckReducer: { decks } }, { navigation }) => {
+  const { title } = navigation.state.params;
+
+  return { title, deck: decks.find(x => x.title === title) };
+};
+
+const mapDispatchToProps = (dispatch, { navigation }) => ({
+  goBack: () => navigation.goBack()
 });
-
-function mapStateToProps(state, { navigation }) {
-  const { title } = navigation.state.params;
-
-  return {
-    title,
-    decks: state,
-    deck: state[title]
-  };
-}
-
-function mapDispatchToProps(dispatch, { navigation }) {
-  const { title } = navigation.state.params;
-
-  return {
-    goBack: () => navigation.goBack()
-  };
-}
 
 export default connect(
   mapStateToProps,
