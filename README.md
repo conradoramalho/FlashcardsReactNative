@@ -24,6 +24,12 @@ Running project:
   $ yarn install
   ```
 
+  - Running via Yarn:
+
+  ```sh
+  $ yarn start
+  ```
+
 ## Directory structure
 
     app/
@@ -44,4 +50,4 @@ To add new modules you need to create a folder in modules directory
 
 ## Authors
 
-> [Conrado Ramalho](https://github.com/conradoramalho)\
+> [Conrado Ramalho](https://github.com/conradoramalho)
