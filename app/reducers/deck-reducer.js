@@ -1,11 +1,7 @@
 import * as ACTIONS from '../actions/types';
 
 const INITIAL_STATE = {
-<<<<<<< HEAD
   decks: [],
-=======
-  decks: []
->>>>>>> 9f9e7b809d6399705cdce10ac9e783504f8d0f1b
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
@@ -13,12 +9,12 @@ const reducer = (state = INITIAL_STATE, action) => {
     case ACTIONS.RECEIVE_DECKS_REQUEST:
       return {
         ...state,
-        decks: [...action.payload]
+        decks: [...action.payload],
       };
     case ACTIONS.SAVE_DECK_REQUEST:
       return {
         ...state,
-        decks: [...state.decks, { title: action.payload, questions: [] }]
+        decks: [...state.decks, { title: action.payload, questions: [] }],
       };
 
     case ACTIONS.ADD_QS_DECK_REQUEST:

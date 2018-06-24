@@ -1,15 +1,15 @@
-import React from "react";
-import { View } from "react-native";
-import { createStore, applyMiddleware } from "redux";
-import { Provider } from "react-redux";
-import reducer from "./app/reducers";
-import FlashStatusBar from "./app/components/FlashStatusBar";
-import { black } from "./app/main/colors";
-import { setLocalNotification } from "./app/main/Notification";
-import Navigation from "./app/main/Router";
-import reduxThunk from "redux-thunk";
+import React, { Component } from 'react';
+import { View } from 'react-native';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import reducer from './app/reducers';
+import FlashStatusBar from './app/components/FlashStatusBar';
+import { black } from './app/main/colors';
+import { setLocalNotification } from './app/main/Notification';
+import Navigation from './app/main/Router';
+import reduxThunk from 'redux-thunk';
 
-export default class App extends React.Component {
+class App extends Component {
   componentDidMount() {
     setLocalNotification();
   }
@@ -27,3 +27,5 @@ export default class App extends React.Component {
     );
   }
 }
+
+export default App;

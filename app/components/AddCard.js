@@ -1,9 +1,9 @@
-import React, { PureComponent } from "react";
-import { Keyboard, KeyboardAvoidingView, Text } from "react-native";
-import styled from "styled-components/native";
-import { FormLabel, FormInput, TouchableOpacity } from "react-native-elements";
-import { connect } from "react-redux";
-import { addQuestionToDeck } from "../actions";
+import React, { PureComponent } from 'react';
+import { Keyboard, KeyboardAvoidingView, Text } from 'react-native';
+import styled from 'styled-components/native';
+import { FormLabel, FormInput, TouchableOpacity } from 'react-native-elements';
+import { connect } from 'react-redux';
+import { addQuestionToDeck } from '../actions';
 
 const StyledView = styled.View`
   padding: 12px;
@@ -28,14 +28,14 @@ class AddCard extends PureComponent {
     const { title } = navigation.state.params;
 
     return {
-      title
+      title,
     };
   };
 
   state = {
-    question: "",
-    answer: "",
-    isCardValid: false
+    question: '',
+    answer: '',
+    isCardValid: false,
   };
 
   onQuestionChange = question => {
@@ -43,7 +43,7 @@ class AddCard extends PureComponent {
 
     this.setState({
       question,
-      isCardValid: !this.isEmptyOrInvalid(answer, question)
+      isCardValid: !this.isEmptyOrInvalid(answer, question),
     });
   };
 
@@ -52,7 +52,7 @@ class AddCard extends PureComponent {
 
     this.setState({
       answer,
-      isCardValid: !this.isEmptyOrInvalid(answer, question)
+      isCardValid: !this.isEmptyOrInvalid(answer, question),
     });
   };
 
@@ -66,19 +66,19 @@ class AddCard extends PureComponent {
     addQuestionToDeck(title, { question, answer });
 
     this.setState({
-      question: "",
-      answer: "",
-      isCardValid: false
+      question: '',
+      answer: '',
+      isCardValid: false,
     });
 
-    navigation.navigate("Deck", { title });
+    navigation.navigate('Deck', { title });
   };
 
   isEmptyOrInvalid = (first, second) =>
     !first ||
     !second ||
-    !first.replace(pattern, "").length > 0 ||
-    !second.replace(pattern, "").length > 0;
+    !first.replace(pattern, '').length > 0 ||
+    !second.replace(pattern, '').length > 0;
 
   render() {
     const { question, answer, isCardValid } = this.state;
@@ -107,11 +107,11 @@ class AddCard extends PureComponent {
   }
 }
 
-function mapStateToProps({ deckReducer: { decks } }, { navigation }) {
+const mapStateToProps = ({ deckReducer: { decks } }, { navigation }) => {
   const { deckTitle } = navigation.state.params;
 
   return { title: deckTitle, deck: decks.find(x => x.title === deckTitle) };
-}
+};
 
 export default connect(
   mapStateToProps,

@@ -1,31 +1,31 @@
-import React, { Component } from "react";
+import React, { PureComponent } from 'react';
 import {
   View,
   StyleSheet,
   Text,
   Keyboard,
-  KeyboardAvoidingView
-} from "react-native";
-import { FormLabel, FormInput, Button } from "react-native-elements";
-import { white, black } from "../main/colors";
-import { connect } from "react-redux";
-import { addNewDeck } from "../actions";
+  KeyboardAvoidingView,
+} from 'react-native';
+import { FormLabel, FormInput, Button } from 'react-native-elements';
+import { white, black } from '../main/colors';
+import { connect } from 'react-redux';
+import { addNewDeck } from '../actions';
 
 const pattern = /\s*/;
 
-class AddDeck extends Component {
+class AddDeck extends PureComponent {
   state = {
-    deckTitle: "",
-    isTitleValid: false
+    deckTitle: '',
+    isTitleValid: false,
   };
 
   onTitleChange = title => {
-    const isEmpty = !title || !(title.replace(pattern, "").length > 0);
+    const isEmpty = !title || !(title.replace(pattern, '').length > 0);
     const hasDeckWithTitle = this.props.decks.includes(title.toUpperCase());
 
     this.setState({
       deckTitle: title,
-      isTitleValid: !isEmpty && !hasDeckWithTitle
+      isTitleValid: !isEmpty && !hasDeckWithTitle,
     });
   };
 
@@ -36,12 +36,12 @@ class AddDeck extends Component {
     Keyboard.dismiss();
 
     this.setState({
-      deckTitle: "",
-      isTitleValid: false
+      deckTitle: '',
+      isTitleValid: false,
     });
 
     addNewDeck(title).then(() => {
-      navigation.navigate("Deck", { title });
+      navigation.navigate('Deck', { title });
     });
   };
 
@@ -71,19 +71,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: white,
     padding: 15,
-    alignItems: "center"
+    alignItems: 'center',
   },
   button: {
-    padding: 12
-  }
+    padding: 12,
+  },
 });
 
-function mapStateToProps(data) {
+const mapStateToProps = data => {
   const keys = Object.keys(data);
   return {
-    decks: keys.map(key => key.toUpperCase())
+    decks: keys.map(key => key.toUpperCase()),
   };
-}
+};
 
 export default connect(
   mapStateToProps,
